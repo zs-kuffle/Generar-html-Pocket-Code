@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>ZS-KUFFLE Catrobat ZIP → HTML</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+<style>
+body {
+    font-family: Arial;
+    background: #0f172a;
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+
+h1 {
+    color: #38bdf8;
+}
+
+input {
+    margin: 20px;
+}
+
+#files {
+    background: #1e293b;
+    padding: 10px;
+    border-radius: 10px;
+    max-height: 300px;
+    overflow: auto;
+}
+
+button {
+    padding: 10px 20px;
+    background: #38bdf8;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<h1>📦 Catrobat ZIP → HTML Viewer</h1>
+
+<input type="file" id="zipInput" accept=".zip">
+
+<div id="files">Aquí aparecerán los archivos...</div>
+
+<br>
+<button onclick="descargarHTML()">⬇ Descargar HTML del MOD</button>
+
+<script>
+let archivosExtraidos = [];
+
+document.getElementById("zipInput").addEventListener("change", async function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const zip = new JSZip();
+    const contenido = await zip.loadAsync(file);
+
+    const lista = document.getElementById("files");
+    lista.innerHTML = "";
+
+    archivosExtraidos = [];
+
+    contenido.forEach((ruta, archivo) => {
+        archivosExtraidos.push(ruta);
+        const div = document.createElement("div");
+        div.textContent = ruta;
+        lista.appendChild(div);
+    });
+});
+
+function descargarHTML() {
+    let contenidoHTML = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <title>MOD Catrobat</title>
+    </head>
+    <body>
+    <h1>Proyecto extraído</h1>
+    <ul>
+    `;
+
+    archivosExtraidos.forEach(a => {
+        contenidoHTML += `<li>${a}</li>`;
+    });
+
+    contenidoHTML += `
+    </ul>
+    </body>
+    </html>
+    `;
+
+    const blob = new Blob([contenidoHTML], {type: "text/html"});
+    const link = document.createElement("a");
+
+    link.href = URL.createObjectURL(blob);
+    link.download = "mod_catrobat.html";
+    link.click();
+}
+</script>
+
+</body>
+</html>
